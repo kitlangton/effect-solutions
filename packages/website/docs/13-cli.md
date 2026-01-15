@@ -259,52 +259,49 @@ class TaskRepo extends Context.Tag("TaskRepo")<
     readonly clear: () => Effect.Effect<void>
   }
 >() {
-  static layer = Layer.effect(
-    TaskRepo,
-    Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem
-      const path = "tasks.json"
+  static layer = Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem
+    const path = "tasks.json"
 
-      // Helpers
-      const load = Effect.gen(function* () {
-        const content = yield* fs.readFileString(path)
-        return yield* Schema.decode(TaskList.Json)(content)
-      }).pipe(Effect.orElseSucceed(() => TaskList.empty))
+    // Helpers
+    const load = Effect.gen(function* () {
+      const content = yield* fs.readFileString(path)
+      return yield* Schema.decode(TaskList.Json)(content)
+    }).pipe(Effect.orElseSucceed(() => TaskList.empty))
 
-      const save = (list: TaskList) =>
-        Effect.gen(function* () {
-          const json = yield* Schema.encode(TaskList.Json)(list)
-          yield* fs.writeFileString(path, json)
-        })
-
-      // Public API
-      const list = Effect.fn("TaskRepo.list")(function* (all?: boolean) {
-        const taskList = yield* load
-        if (all) return taskList.tasks
-        return taskList.tasks.filter((t) => !t.done)
+    const save = (list: TaskList) =>
+      Effect.gen(function* () {
+        const json = yield* Schema.encode(TaskList.Json)(list)
+        yield* fs.writeFileString(path, json)
       })
 
-      const add = Effect.fn("TaskRepo.add")(function* (text: string) {
-        const list = yield* load
-        const [newList, task] = list.add(text)
-        yield* save(newList)
-        return task
-      })
-
-      const toggle = Effect.fn("TaskRepo.toggle")(function* (id: TaskId) {
-        const list = yield* load
-        const [newList, task] = list.toggle(id)
-        yield* save(newList)
-        return task
-      })
-
-      const clear = Effect.fn("TaskRepo.clear")(function* () {
-        yield* save(TaskList.empty)
-      })
-
-      return { list, add, toggle, clear }
+    // Public API
+    const list = Effect.fn("TaskRepo.list")(function* (all?: boolean) {
+      const taskList = yield* load
+      if (all) return taskList.tasks
+      return taskList.tasks.filter((t) => !t.done)
     })
-  )
+
+    const add = Effect.fn("TaskRepo.add")(function* (text: string) {
+      const list = yield* load
+      const [newList, task] = list.add(text)
+      yield* save(newList)
+      return task
+    })
+
+    const toggle = Effect.fn("TaskRepo.toggle")(function* (id: TaskId) {
+      const list = yield* load
+      const [newList, task] = list.toggle(id)
+      yield* save(newList)
+      return task
+    })
+
+    const clear = Effect.fn("TaskRepo.clear")(function* () {
+      yield* save(TaskList.empty)
+    })
+
+    return TaskRepo.of({ list, add, toggle, clear })
+  }).pipe(Layer.effect(TaskRepo))
 }
 ```
 

@@ -93,41 +93,38 @@ export class IssueService extends Context.Tag("@cli/IssueService")<
     ) => Effect.Effect<OpenIssueResult, BrowserOpenError>;
   }
 >() {
-  static readonly layer = Layer.effect(
-    IssueService,
-    Effect.gen(function* () {
-      const browser = yield* BrowserService;
+  static readonly layer = Effect.gen(function* () {
+    const browser = yield* BrowserService;
 
-      const open = Effect.fn("IssueService.open")((input: OpenIssueInput) =>
-        Effect.gen(function* () {
-          const repoUrl = "https://github.com/kitlangton/effect-solutions";
+    const open = Effect.fn("IssueService.open")(function* (
+      input: OpenIssueInput,
+    ) {
+      const repoUrl = "https://github.com/kitlangton/effect-solutions";
 
-          if (!input.category && !input.title && !input.description) {
-            const issueUrl = `${repoUrl}/issues/new`;
-            yield* browser.open(issueUrl);
-            return { issueUrl };
-          }
+      if (!input.category && !input.title && !input.description) {
+        const issueUrl = `${repoUrl}/issues/new`;
+        yield* browser.open(issueUrl);
+        return { issueUrl };
+      }
 
-          const fullTitle =
-            input.category && input.title
-              ? `[${input.category}] ${input.title}`
-              : input.title || "";
-          const body = input.description
-            ? `## Description\n\n${input.description}\n\n---\n*Created via [Effect Solutions CLI](${repoUrl})*`
-            : `---\n*Created via [Effect Solutions CLI](${repoUrl})*`;
+      const fullTitle =
+        input.category && input.title
+          ? `[${input.category}] ${input.title}`
+          : input.title || "";
+      const body = input.description
+        ? `## Description\n\n${input.description}\n\n---\n*Created via [Effect Solutions CLI](${repoUrl})*`
+        : `---\n*Created via [Effect Solutions CLI](${repoUrl})*`;
 
-          const params = new URLSearchParams();
-          if (fullTitle) params.set("title", fullTitle);
-          if (body) params.set("body", body);
+      const params = new URLSearchParams();
+      if (fullTitle) params.set("title", fullTitle);
+      if (body) params.set("body", body);
 
-          const issueUrl = `${repoUrl}/issues/new?${params.toString()}`;
-          yield* browser.open(issueUrl);
+      const issueUrl = `${repoUrl}/issues/new?${params.toString()}`;
+      yield* browser.open(issueUrl);
 
-          return { issueUrl };
-        }),
-      );
+      return { issueUrl };
+    });
 
-      return IssueService.of({ open });
-    }),
-  );
+    return IssueService.of({ open });
+  }).pipe(Layer.effect(IssueService));
 }

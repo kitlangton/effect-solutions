@@ -79,30 +79,23 @@ class ApiConfig extends Context.Tag("@app/ApiConfig")<
     readonly timeout: number
   }
 >() {
-  static readonly layer = Layer.effect(
-    ApiConfig,
-    Effect.gen(function* () {
-      const apiKey = yield* Config.redacted("API_KEY")
-      const baseUrl = yield* Config.string("API_BASE_URL").pipe(
-        Config.orElse(() => Config.succeed("https://api.example.com"))
-      )
-      const timeout = yield* Config.integer("API_TIMEOUT").pipe(
-        Config.orElse(() => Config.succeed(30000))
-      )
-
-      return ApiConfig.of({ apiKey, baseUrl, timeout })
-    })
-  )
+  static readonly layer = Effect.gen(function* () {
+    const apiKey = yield* Config.redacted("API_KEY")
+    const baseUrl = yield* Config.string("API_BASE_URL").pipe(
+      Config.orElse(() => Config.succeed("https://api.example.com"))
+    )
+    const timeout = yield* Config.integer("API_TIMEOUT").pipe(
+      Config.orElse(() => Config.succeed(30000))
+    )
+    return ApiConfig.of({ apiKey, baseUrl, timeout })
+  }).pipe(Layer.effect(ApiConfig))
 
   // For tests - hardcoded values
-  static readonly testLayer = Layer.succeed(
-    ApiConfig,
-    ApiConfig.of({
-      apiKey: Redacted.make("test-key"),
-      baseUrl: "https://test.example.com",
-      timeout: 5000,
-    })
-  )
+  static readonly testLayer = Layer.succeed(ApiConfig, {
+    apiKey: Redacted.make("test-key"),
+    baseUrl: "https://test.example.com",
+    timeout: 5000,
+  })
 }
 ```
 
@@ -277,14 +270,11 @@ class ApiConfig extends Context.Tag("@app/ApiConfig")<
     readonly baseUrl: string
   }
 >() {
-  static readonly layer = Layer.effect(
-    ApiConfig,
-    Effect.gen(function* () {
-      const apiKey = yield* Config.redacted("API_KEY")
-      const baseUrl = yield* Config.string("API_BASE_URL")
-      return ApiConfig.of({ apiKey, baseUrl })
-    })
-  )
+  static readonly layer = Effect.gen(function* () {
+    const apiKey = yield* Config.redacted("API_KEY")
+    const baseUrl = yield* Config.string("API_BASE_URL")
+    return ApiConfig.of({ apiKey, baseUrl })
+  }).pipe(Layer.effect(ApiConfig))
 }
 
 const program = Effect.gen(function* () {
@@ -377,16 +367,13 @@ class DatabaseConfig extends Context.Tag("@app/DatabaseConfig")<
     readonly password: Redacted.Redacted
   }
 >() {
-  static readonly layer = Layer.effect(
-    DatabaseConfig,
-    Effect.gen(function* () {
-      const host = yield* Schema.Config("DB_HOST", Schema.String)
-      const port = yield* Schema.Config("DB_PORT", Port)
-      const database = yield* Schema.Config("DB_NAME", Schema.String)
-      const password = yield* Schema.Config("DB_PASSWORD", Schema.Redacted(Schema.String))
+  static readonly layer = Effect.gen(function* () {
+    const host = yield* Schema.Config("DB_HOST", Schema.String)
+    const port = yield* Schema.Config("DB_PORT", Port)
+    const database = yield* Schema.Config("DB_NAME", Schema.String)
+    const password = yield* Schema.Config("DB_PASSWORD", Schema.Redacted(Schema.String))
 
-      return DatabaseConfig.of({ host, port, database, password })
-    })
-  )
+    return DatabaseConfig.of({ host, port, database, password })
+  }).pipe(Layer.effect(DatabaseConfig))
 }
 ```

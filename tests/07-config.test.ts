@@ -75,29 +75,23 @@ describe("07-config", () => {
             readonly timeout: number;
           }
         >() {
-          static readonly layer = Layer.effect(
-            ApiConfig,
-            Effect.gen(function* () {
-              const apiKey = yield* Config.redacted("API_KEY");
-              const baseUrl = yield* Config.string("API_BASE_URL").pipe(
-                Config.orElse(() => Config.succeed("https://api.example.com")),
-              );
-              const timeout = yield* Config.integer("API_TIMEOUT").pipe(
-                Config.orElse(() => Config.succeed(30000)),
-              );
+          static readonly layer = Effect.gen(function* () {
+            const apiKey = yield* Config.redacted("API_KEY");
+            const baseUrl = yield* Config.string("API_BASE_URL").pipe(
+              Config.orElse(() => Config.succeed("https://api.example.com")),
+            );
+            const timeout = yield* Config.integer("API_TIMEOUT").pipe(
+              Config.orElse(() => Config.succeed(30000)),
+            );
 
-              return ApiConfig.of({ apiKey, baseUrl, timeout });
-            }),
-          );
+            return ApiConfig.of({ apiKey, baseUrl, timeout });
+          }).pipe(Layer.effect(ApiConfig));
 
-          static readonly testLayer = Layer.succeed(
-            ApiConfig,
-            ApiConfig.of({
-              apiKey: Redacted.make("test-key"),
-              baseUrl: "https://test.example.com",
-              timeout: 5000,
-            }),
-          );
+          static readonly testLayer = Layer.succeed(ApiConfig, {
+            apiKey: Redacted.make("test-key"),
+            baseUrl: "https://test.example.com",
+            timeout: 5000,
+          });
         }
 
         const program = Effect.gen(function* () {
@@ -127,16 +121,13 @@ describe("07-config", () => {
             readonly database: string;
           }
         >() {
-          static readonly layer = Layer.effect(
-            DbConfig,
-            Effect.gen(function* () {
-              const host = yield* Config.string("DB_HOST");
-              const port = yield* Config.integer("DB_PORT");
-              const database = yield* Config.string("DB_NAME");
+          static readonly layer = Effect.gen(function* () {
+            const host = yield* Config.string("DB_HOST");
+            const port = yield* Config.integer("DB_PORT");
+            const database = yield* Config.string("DB_NAME");
 
-              return DbConfig.of({ host, port, database });
-            }),
-          );
+            return DbConfig.of({ host, port, database });
+          }).pipe(Layer.effect(DbConfig));
         }
 
         const testConfig = ConfigProvider.fromMap(
@@ -408,23 +399,20 @@ describe("07-config", () => {
             readonly features: { enableCache: boolean };
           }
         >() {
-          static readonly layer = Layer.effect(
-            AppConfig,
-            Effect.gen(function* () {
-              const port = yield* Config.integer("PORT");
-              const host = yield* Config.string("HOST");
-              const dbUrl = yield* Config.string("DATABASE_URL");
-              const enableCache = yield* Config.boolean("ENABLE_CACHE").pipe(
-                Config.orElse(() => Config.succeed(false)),
-              );
+          static readonly layer = Effect.gen(function* () {
+            const port = yield* Config.integer("PORT");
+            const host = yield* Config.string("HOST");
+            const dbUrl = yield* Config.string("DATABASE_URL");
+            const enableCache = yield* Config.boolean("ENABLE_CACHE").pipe(
+              Config.orElse(() => Config.succeed(false)),
+            );
 
-              return AppConfig.of({
-                server: { port, host },
-                database: { url: dbUrl },
-                features: { enableCache },
-              });
-            }),
-          );
+            return AppConfig.of({
+              server: { port, host },
+              database: { url: dbUrl },
+              features: { enableCache },
+            });
+          }).pipe(Layer.effect(AppConfig));
         }
 
         const testConfig = ConfigProvider.fromMap(

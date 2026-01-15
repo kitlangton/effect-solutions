@@ -93,37 +93,34 @@ class Users extends Context.Tag("@app/Users")<
     readonly all: () => Effect.Effect<readonly User[]>
   }
 >() {
-  static readonly layer = Layer.effect(
-    Users,
-    Effect.gen(function* () {
-      // 1. yield* services you depend on
-      const http = yield* HttpClient.HttpClient
-      const analytics = yield* Analytics
+  static readonly layer = Effect.gen(function* () {
+    // 1. yield* services you depend on
+    const http = yield* HttpClient.HttpClient
+    const analytics = yield* Analytics
 
-      // 2. define the service methods with Effect.fn for call-site tracing
-      const findById = Effect.fn("Users.findById")(
-        function* (id: UserId) {
-          yield* analytics.track("user.find", { id })
-          const response = yield* http.get(`https://api.example.com/users/${id}`)
-          return yield* HttpClientResponse.schemaBodyJson(User)(response)
-        },
-        Effect.catchTag("ResponseError", (error) =>
-          error.response.status === 404
-            ? UserNotFoundError.make({ id })
-            : GenericUsersError.make({ id, error }),
-        ),
-      )
+    // 2. define the service methods with Effect.fn for call-site tracing
+    const findById = Effect.fn("Users.findById")(
+      function* (id: UserId) {
+        yield* analytics.track("user.find", { id })
+        const response = yield* http.get(`https://api.example.com/users/${id}`)
+        return yield* HttpClientResponse.schemaBodyJson(User)(response)
+      },
+      Effect.catchTag("ResponseError", (error) =>
+        error.response.status === 404
+          ? UserNotFoundError.make({ id })
+          : GenericUsersError.make({ id, error }),
+      ),
+    )
 
-      // Use Effect.fn even for nullary methods (thunks) to enable tracing
-      const all = Effect.fn("Users.all")(function* () {
-        const response = yield* http.get("https://api.example.com/users")
-        return yield* HttpClientResponse.schemaBodyJson(Schema.Array(User))(response)
-      })
-
-      // 3. return the service
-      return Users.of({ findById, all })
+    // Use Effect.fn even for nullary methods (thunks) to enable tracing
+    const all = Effect.fn("Users.all")(function* () {
+      const response = yield* http.get("https://api.example.com/users")
+      return yield* HttpClientResponse.schemaBodyJson(Schema.Array(User))(response)
     })
-  )
+
+    // 3. return the service
+    return Users.of({ findById, all })
+  }).pipe(Layer.effect(Users))
 }
 ```
 
@@ -200,40 +197,37 @@ class Events extends Context.Tag("@app/Events")<
     readonly register: (eventId: EventId, userId: UserId) => Effect.Effect<Registration>
   }
 >() {
-  static readonly layer = Layer.effect(
-    Events,
-    Effect.gen(function* () {
-      const users = yield* Users
-      const tickets = yield* Tickets
-      const emails = yield* Emails
+  static readonly layer = Effect.gen(function* () {
+    const users = yield* Users
+    const tickets = yield* Tickets
+    const emails = yield* Emails
 
-      const register = Effect.fn("Events.register")(
-        function* (eventId: EventId, userId: UserId) {
-          const user = yield* users.findById(userId)
-          const ticket = yield* tickets.issue(eventId, userId)
-          const now = yield* Clock.currentTimeMillis
+    const register = Effect.fn("Events.register")(
+      function* (eventId: EventId, userId: UserId) {
+        const user = yield* users.findById(userId)
+        const ticket = yield* tickets.issue(eventId, userId)
+        const now = yield* Clock.currentTimeMillis
 
-          const registration = Registration.make({
-            id: RegistrationId.make(crypto.randomUUID()),
-            eventId,
-            userId,
-            ticketId: ticket.id,
-            registeredAt: new Date(now),
-          })
+        const registration = Registration.make({
+          id: RegistrationId.make(crypto.randomUUID()),
+          eventId,
+          userId,
+          ticketId: ticket.id,
+          registeredAt: new Date(now),
+        })
 
-          yield* emails.send(
-            user.email,
-            "Event Registration Confirmed",
-            `Your ticket code: ${ticket.code}`
-          )
+        yield* emails.send(
+          user.email,
+          "Event Registration Confirmed",
+          `Your ticket code: ${ticket.code}`
+        )
 
-          return registration
-        }
-      )
+        return registration
+      }
+    )
 
-      return Events.of({ register })
-    })
-  )
+    return Events.of({ register })
+  }).pipe(Layer.effect(Events))
 }
 ```
 
@@ -422,10 +416,10 @@ class Counter extends Context.Tag("@app/Counter")<
 >() {
   static readonly layer = Layer.sync(Counter, () => {
     let count = 0
-    return {
+    return Counter.of({
       get: () => Effect.succeed(count),
       increment: () => Effect.sync(() => void count++),
-    }
+    })
   })
 }
 
@@ -461,10 +455,10 @@ class Counter extends Context.Tag("@app/Counter")<
 >() {
   static readonly layer = Layer.sync(Counter, () => {
     let count = 0
-    return {
+    return Counter.of({
       get: () => Effect.succeed(count),
       increment: () => Effect.sync(() => void count++),
-    }
+    })
   })
 }
 

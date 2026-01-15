@@ -54,15 +54,12 @@ describe("maybeNotifyUpdate (effect)", () => {
       "utf8",
     );
 
-    const testConfigLayer = Layer.succeed(
-      UpdateNotifierConfig,
-      UpdateNotifierConfig.of({
-        checkInterval: 1000 * 60 * 60 * 24,
-        timeout: 3000,
-        isCi: false,
-        homeDir: tmpHome,
-      }),
-    );
+    const testConfigLayer = Layer.succeed(UpdateNotifierConfig, {
+      checkInterval: 1000 * 60 * 60 * 24,
+      timeout: 3000,
+      isCi: false,
+      homeDir: tmpHome,
+    });
 
     const program = Effect.gen(function* () {
       const notifier = yield* UpdateNotifier;
@@ -89,15 +86,12 @@ describe("maybeNotifyUpdate (effect)", () => {
       "utf8",
     );
 
-    const testConfigLayer = Layer.succeed(
-      UpdateNotifierConfig,
-      UpdateNotifierConfig.of({
-        checkInterval: 1000 * 60 * 60 * 24,
-        timeout: 3000,
-        isCi: false,
-        homeDir: tmpHome,
-      }),
-    );
+    const testConfigLayer = Layer.succeed(UpdateNotifierConfig, {
+      checkInterval: 1000 * 60 * 60 * 24,
+      timeout: 3000,
+      isCi: false,
+      homeDir: tmpHome,
+    });
 
     const program = Effect.gen(function* () {
       const notifier = yield* UpdateNotifier;
@@ -124,15 +118,12 @@ describe("maybeNotifyUpdate (effect)", () => {
       "utf8",
     );
 
-    const testConfigLayer = Layer.succeed(
-      UpdateNotifierConfig,
-      UpdateNotifierConfig.of({
-        checkInterval: 1000 * 60 * 60 * 24,
-        timeout: 3000,
-        isCi: true,
-        homeDir: tmpHome,
-      }),
-    );
+    const testConfigLayer = Layer.succeed(UpdateNotifierConfig, {
+      checkInterval: 1000 * 60 * 60 * 24,
+      timeout: 3000,
+      isCi: true,
+      homeDir: tmpHome,
+    });
 
     const program = Effect.gen(function* () {
       const notifier = yield* UpdateNotifier;
@@ -158,15 +149,12 @@ describe("maybeNotifyUpdate (effect)", () => {
       "utf8",
     );
 
-    const testConfigLayer = Layer.succeed(
-      UpdateNotifierConfig,
-      UpdateNotifierConfig.of({
-        checkInterval: 1000 * 60 * 60 * 24,
-        timeout: 3000,
-        isCi: false,
-        homeDir: tmpHome,
-      }),
-    );
+    const testConfigLayer = Layer.succeed(UpdateNotifierConfig, {
+      checkInterval: 1000 * 60 * 60 * 24,
+      timeout: 3000,
+      isCi: false,
+      homeDir: tmpHome,
+    });
 
     const program = Effect.gen(function* () {
       const notifier = yield* UpdateNotifier;

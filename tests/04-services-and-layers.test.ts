@@ -61,17 +61,14 @@ describe("04-services-and-layers", () => {
           Api,
           { readonly fetch: (path: string) => Effect.Effect<string> }
         >() {
-          static readonly layer = Layer.effect(
-            Api,
-            Effect.gen(function* () {
-              const config = yield* Config;
+          static readonly layer = Effect.gen(function* () {
+            const config = yield* Config;
 
-              const fetch = (path: string) =>
-                Effect.succeed(`${config.apiUrl}${path}`);
+            const fetch = (path: string) =>
+              Effect.succeed(`${config.apiUrl}${path}`);
 
-              return Api.of({ fetch });
-            }),
-          );
+            return Api.of({ fetch });
+          }).pipe(Layer.effect(Api));
         }
 
         const testConfig = Layer.succeed(Config, {
@@ -103,19 +100,16 @@ describe("04-services-and-layers", () => {
           Analytics,
           { readonly track: (event: string) => Effect.Effect<void> }
         >() {
-          static readonly layer = Layer.effect(
-            Analytics,
-            Effect.gen(function* () {
-              const logger = yield* Logger;
+          static readonly layer = Effect.gen(function* () {
+            const logger = yield* Logger;
 
-              const track = (event: string) =>
-                Effect.gen(function* () {
-                  yield* logger.log(`Tracking: ${event}`);
-                });
+            const track = (event: string) =>
+              Effect.gen(function* () {
+                yield* logger.log(`Tracking: ${event}`);
+              });
 
-              return Analytics.of({ track });
-            }),
-          );
+            return Analytics.of({ track });
+          }).pipe(Layer.effect(Analytics));
         }
 
         const events: string[] = [];
@@ -338,25 +332,22 @@ describe("04-services-and-layers", () => {
             ) => Effect.Effect<{ id: string; name: string }>;
           }
         >() {
-          static readonly layer = Layer.effect(
-            UserService,
-            Effect.gen(function* () {
-              const users = yield* Users;
-              const notifications = yield* Notifications;
-              const analytics = yield* Analytics;
+          static readonly layer = Effect.gen(function* () {
+            const users = yield* Users;
+            const notifications = yield* Notifications;
+            const analytics = yield* Analytics;
 
-              const activate = Effect.fn("UserService.activate")(function* (
-                userId: string,
-              ) {
-                const user = yield* users.findById(userId);
-                yield* notifications.send(userId, "Account activated!");
-                yield* analytics.track("user.activated", { userId });
-                return user;
-              });
+            const activate = Effect.fn("UserService.activate")(function* (
+              userId: string,
+            ) {
+              const user = yield* users.findById(userId);
+              yield* notifications.send(userId, "Account activated!");
+              yield* analytics.track("user.activated", { userId });
+              return user;
+            });
 
-              return UserService.of({ activate });
-            }),
-          );
+            return UserService.of({ activate });
+          }).pipe(Layer.effect(UserService));
         }
 
         // Test implementations
@@ -433,24 +424,21 @@ describe("04-services-and-layers", () => {
               ) => Effect.Effect<string>;
             }
           >() {
-            static readonly layer = Layer.effect(
-              CheckoutService,
-              Effect.gen(function* () {
-                const email = yield* EmailService;
-                const payment = yield* PaymentService;
+            static readonly layer = Effect.gen(function* () {
+              const email = yield* EmailService;
+              const payment = yield* PaymentService;
 
-                const process = Effect.fn("CheckoutService.process")(function* (
-                  userId: string,
-                  amount: number,
-                ) {
-                  const txId = yield* payment.charge(userId, amount);
-                  yield* email.send(userId, `Payment successful: ${txId}`);
-                  return txId;
-                });
+              const process = Effect.fn("CheckoutService.process")(function* (
+                userId: string,
+                amount: number,
+              ) {
+                const txId = yield* payment.charge(userId, amount);
+                yield* email.send(userId, `Payment successful: ${txId}`);
+                return txId;
+              });
 
-                return CheckoutService.of({ process });
-              }),
-            );
+              return CheckoutService.of({ process });
+            }).pipe(Layer.effect(CheckoutService));
           }
 
           // Implement test versions later
@@ -526,15 +514,12 @@ describe("04-services-and-layers", () => {
           Formatter,
           { readonly format: (msg: string) => Effect.Effect<string> }
         >() {
-          static readonly layer = Layer.effect(
-            Formatter,
-            Effect.gen(function* () {
-              const config = yield* Config;
-              return Formatter.of({
-                format: (msg) => Effect.succeed(`[${config.prefix}] ${msg}`),
-              });
-            }),
-          );
+          static readonly layer = Effect.gen(function* () {
+            const config = yield* Config;
+            return Formatter.of({
+              format: (msg) => Effect.succeed(`[${config.prefix}] ${msg}`),
+            });
+          }).pipe(Layer.effect(Formatter));
         }
 
         const configLayer = Layer.succeed(Config, { prefix: "TEST" });
@@ -564,13 +549,10 @@ describe("04-services-and-layers", () => {
           Database,
           { readonly query: () => Effect.Effect<string> }
         >() {
-          static readonly layer = Layer.effect(
-            Database,
-            Effect.gen(function* () {
-              const config = yield* Config;
-              return { query: () => Effect.succeed(config.url) };
-            }),
-          );
+          static readonly layer = Effect.gen(function* () {
+            const config = yield* Config;
+            return Database.of({ query: () => Effect.succeed(config.url) });
+          }).pipe(Layer.effect(Database));
         }
 
         // Layer.provide wires up the dependency
@@ -599,13 +581,10 @@ describe("04-services-and-layers", () => {
           Logger,
           { readonly log: () => Effect.Effect<string> }
         >() {
-          static readonly layer = Layer.effect(
-            Logger,
-            Effect.gen(function* () {
-              const config = yield* Config;
-              return { log: () => Effect.succeed(`[${config.env}]`) };
-            }),
-          );
+          static readonly layer = Effect.gen(function* () {
+            const config = yield* Config;
+            return Logger.of({ log: () => Effect.succeed(`[${config.env}]`) });
+          }).pipe(Layer.effect(Logger));
         }
 
         // provideMerge: Logger + Config both available
@@ -643,20 +622,17 @@ describe("04-services-and-layers", () => {
           App,
           { readonly run: () => Effect.Effect<string> }
         >() {
-          static readonly layer = Layer.effect(
-            App,
-            Effect.gen(function* () {
-              const config = yield* Config;
-              const logger = yield* Logger;
-              return {
-                run: () =>
-                  Effect.gen(function* () {
-                    yield* logger.info("Starting");
-                    return config.name;
-                  }),
-              };
-            }),
-          );
+          static readonly layer = Effect.gen(function* () {
+            const config = yield* Config;
+            const logger = yield* Logger;
+            return App.of({
+              run: () =>
+                Effect.gen(function* () {
+                  yield* logger.info("Starting");
+                  return config.name;
+                }),
+            });
+          }).pipe(Layer.effect(App));
         }
 
         const logs: string[] = [];
@@ -707,30 +683,27 @@ describe("04-services-and-layers", () => {
         >() {}
 
         // Shared layer as a constant
-        const ExpensiveLive = Layer.effect(
-          Expensive,
-          Effect.sync(() => {
-            constructionCount++;
-            return { id: constructionCount };
-          }),
-        );
+        const ExpensiveLive = Effect.sync(() => {
+          constructionCount++;
+          return Expensive.of({ id: constructionCount });
+        }).pipe(Layer.effect(Expensive));
 
         // Both services depend on the same ExpensiveLive reference
-        const ServiceALive = Layer.effect(
-          ServiceA,
-          Effect.gen(function* () {
-            const exp = yield* Expensive;
-            return { getValue: () => Effect.succeed(exp.id) };
-          }),
-        ).pipe(Layer.provide(ExpensiveLive));
+        const ServiceALive = Expensive.pipe(
+          Effect.map((exp) =>
+            ServiceA.of({ getValue: () => Effect.succeed(exp.id) }),
+          ),
+          Layer.effect(ServiceA),
+          Layer.provide(ExpensiveLive),
+        );
 
-        const ServiceBLive = Layer.effect(
-          ServiceB,
-          Effect.gen(function* () {
-            const exp = yield* Expensive;
-            return { getValue: () => Effect.succeed(exp.id) };
-          }),
-        ).pipe(Layer.provide(ExpensiveLive));
+        const ServiceBLive = Expensive.pipe(
+          Effect.map((exp) =>
+            ServiceB.of({ getValue: () => Effect.succeed(exp.id) }),
+          ),
+          Layer.effect(ServiceB),
+          Layer.provide(ExpensiveLive),
+        );
 
         // ExpensiveLive appears twice but same reference = memoized
         const AppLive = Layer.merge(ServiceALive, ServiceBLive);
@@ -762,13 +735,10 @@ describe("04-services-and-layers", () => {
         >() {}
 
         const makeSharedLayer = () =>
-          Layer.effect(
-            Shared,
-            Effect.sync(() => {
-              constructionCount++;
-              return { id: constructionCount };
-            }),
-          );
+          Effect.sync(() => {
+            constructionCount++;
+            return { id: constructionCount };
+          }).pipe(Layer.effect(Shared));
 
         class ServiceA extends Context.Tag("@app/ServiceA")<
           ServiceA,
@@ -781,15 +751,17 @@ describe("04-services-and-layers", () => {
         >() {}
 
         // Bad: inline calls create different references
-        const ServiceALive = Layer.effect(
-          ServiceA,
-          Effect.map(Shared, (s) => ({ id: s.id })),
-        ).pipe(Layer.provide(makeSharedLayer())); // new instance
+        const ServiceALive = Shared.pipe(
+          Effect.map((s) => ({ id: s.id })),
+          Layer.effect(ServiceA),
+          Layer.provide(makeSharedLayer()),
+        ); // new instance
 
-        const ServiceBLive = Layer.effect(
-          ServiceB,
-          Effect.map(Shared, (s) => ({ id: s.id })),
-        ).pipe(Layer.provide(makeSharedLayer())); // another new instance
+        const ServiceBLive = Shared.pipe(
+          Effect.map((s) => ({ id: s.id })),
+          Layer.effect(ServiceB),
+          Layer.provide(makeSharedLayer()),
+        ); // another new instance
 
         const AppLive = Layer.merge(ServiceALive, ServiceBLive);
 

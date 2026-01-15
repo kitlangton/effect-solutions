@@ -36,48 +36,48 @@ const DEFAULT_TASKS = TaskList.make({
   ],
 });
 
-const browserTaskRepoLayer = Layer.effect(
-  TaskRepo,
-  Effect.gen(function* () {
-    const kv = (yield* KeyValueStore).forSchema(TaskList);
+const browserTaskRepoLayer = Effect.gen(function* () {
+  const kv = (yield* KeyValueStore).forSchema(TaskList);
 
-    const loadTaskList = Effect.gen(function* () {
-      const initialized = yield* kv.has(INITIALIZED_KEY);
-      if (!initialized) {
-        yield* kv.set(INITIALIZED_KEY, TaskList.empty);
-        yield* kv.set(STORAGE_KEY, DEFAULT_TASKS);
-        return DEFAULT_TASKS;
-      }
-      const stored = yield* kv.get(STORAGE_KEY);
-      return Option.getOrElse(stored, () => TaskList.empty);
-    }).pipe(Effect.orElseSucceed(() => TaskList.empty));
+  const loadTaskList = Effect.gen(function* () {
+    const initialized = yield* kv.has(INITIALIZED_KEY);
+    if (!initialized) {
+      yield* kv.set(INITIALIZED_KEY, TaskList.empty);
+      yield* kv.set(STORAGE_KEY, DEFAULT_TASKS);
+      return DEFAULT_TASKS;
+    }
+    const stored = yield* kv.get(STORAGE_KEY);
+    return Option.getOrElse(stored, () => TaskList.empty);
+  }).pipe(Effect.orElseSucceed(() => TaskList.empty));
 
-    const saveTaskList = (list: TaskList) =>
-      kv.set(STORAGE_KEY, list).pipe(Effect.ignore);
+  const saveTaskList = (list: TaskList) =>
+    kv.set(STORAGE_KEY, list).pipe(Effect.ignore);
 
-    return TaskRepo.of({
-      list: Effect.fn("TaskRepo.list")(function* (all?: boolean) {
-        const taskList = yield* loadTaskList;
-        return all ? taskList.tasks : taskList.tasks.filter((t) => !t.done);
-      }),
-      add: Effect.fn("TaskRepo.add")(function* (text: string) {
-        const list = yield* loadTaskList;
-        const [newList, task] = list.add(text);
-        yield* saveTaskList(newList);
-        return task;
-      }),
-      toggle: Effect.fn("TaskRepo.toggle")(function* (id: TaskId) {
-        const list = yield* loadTaskList;
-        const [newList, task] = list.toggle(id);
-        yield* saveTaskList(newList);
-        return task;
-      }),
-      clear: Effect.fn("TaskRepo.clear")(function* () {
-        yield* saveTaskList(TaskList.empty);
-      }),
-    });
-  }),
-).pipe(Layer.provide(BrowserKeyValueStore.layerLocalStorage));
+  return TaskRepo.of({
+    list: Effect.fn("TaskRepo.list")(function* (all?: boolean) {
+      const taskList = yield* loadTaskList;
+      return all ? taskList.tasks : taskList.tasks.filter((t) => !t.done);
+    }),
+    add: Effect.fn("TaskRepo.add")(function* (text: string) {
+      const list = yield* loadTaskList;
+      const [newList, task] = list.add(text);
+      yield* saveTaskList(newList);
+      return task;
+    }),
+    toggle: Effect.fn("TaskRepo.toggle")(function* (id: TaskId) {
+      const list = yield* loadTaskList;
+      const [newList, task] = list.toggle(id);
+      yield* saveTaskList(newList);
+      return task;
+    }),
+    clear: Effect.fn("TaskRepo.clear")(function* () {
+      yield* saveTaskList(TaskList.empty);
+    }),
+  });
+}).pipe(
+  Layer.effect(TaskRepo),
+  Layer.provide(BrowserKeyValueStore.layerLocalStorage),
+);
 
 // =============================================================================
 // Terminal Output Service (line accumulator)
@@ -91,16 +91,13 @@ export class TerminalOutput extends Context.Tag("TerminalOutput")<
   }
 >() {}
 
-export const TerminalOutputLive = Layer.effect(
-  TerminalOutput,
-  Effect.gen(function* () {
-    const lines = yield* Ref.make<string[]>([]);
-    return {
-      log: (...args) => Ref.update(lines, (l) => [...l, ...args.map(String)]),
-      getLines: Ref.get(lines),
-    };
-  }),
-);
+export const TerminalOutputLive = Effect.gen(function* () {
+  const lines = yield* Ref.make<string[]>([]);
+  return TerminalOutput.of({
+    log: (...args) => Ref.update(lines, (l) => [...l, ...args.map(String)]),
+    getLines: Ref.get(lines),
+  });
+}).pipe(Layer.effect(TerminalOutput));
 
 // Helper to log to TerminalOutput
 export const log = (...args: ReadonlyArray<unknown>) =>
@@ -111,18 +108,15 @@ export const log = (...args: ReadonlyArray<unknown>) =>
 // =============================================================================
 
 // Terminal mock - display goes to our TerminalOutput accumulator
-export const MockTerminalLayer = Layer.effect(
-  Terminal,
-  Effect.gen(function* () {
-    const output = yield* TerminalOutput;
-    return Terminal.of({
-      columns: Effect.succeed(80),
-      display: (text: string) => output.log(text),
-      readLine: Effect.die("readLine not implemented in browser"),
-      readInput: Effect.die("readInput not implemented in browser"),
-    });
-  }),
-);
+export const MockTerminalLayer = Effect.gen(function* () {
+  const output = yield* TerminalOutput;
+  return Terminal.of({
+    columns: Effect.succeed(80),
+    display: (text: string) => output.log(text),
+    readLine: Effect.die("readLine not implemented in browser"),
+    readInput: Effect.die("readInput not implemented in browser"),
+  });
+}).pipe(Layer.effect(Terminal));
 
 // Console mock - @effect/cli uses Console.log/error for help and error output
 // Must use Console.setConsole to properly override the default console

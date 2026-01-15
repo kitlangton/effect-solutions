@@ -371,42 +371,39 @@ class Events extends Context.Tag("@app/Events")<
   Events,
   { readonly register: (eventId: EventId, userId: UserId) => Effect.Effect<Registration, UserNotFound> }
 >() {
-  static readonly layer = Layer.effect(
-    Events,
-    Effect.gen(function* () {
-      const users = yield* Users
-      const tickets = yield* Tickets
-      const emails = yield* Emails
+  static readonly layer = Effect.gen(function* () {
+    const users = yield* Users
+    const tickets = yield* Tickets
+    const emails = yield* Emails
 
-      const register = Effect.fn("Events.register")(
-        function* (eventId: EventId, userId: UserId) {
-          const user = yield* users.findById(userId)
-          const ticket = yield* tickets.issue(eventId, userId)
-          const now = yield* Clock.currentTimeMillis
+    const register = Effect.fn("Events.register")(
+      function* (eventId: EventId, userId: UserId) {
+        const user = yield* users.findById(userId)
+        const ticket = yield* tickets.issue(eventId, userId)
+        const now = yield* Clock.currentTimeMillis
 
-          const registration = Registration.make({
-            id: RegistrationId.make(crypto.randomUUID()),
-            eventId,
-            userId,
-            ticketId: ticket.id,
-            registeredAt: new Date(now),
+        const registration = Registration.make({
+          id: RegistrationId.make(crypto.randomUUID()),
+          eventId,
+          userId,
+          ticketId: ticket.id,
+          registeredAt: new Date(now),
+        })
+
+        yield* emails.send(
+          Email.make({
+            to: user.email,
+            subject: "Event Registration Confirmed",
+            body: `Your ticket code: ${ticket.code}`,
           })
+        )
 
-          yield* emails.send(
-            Email.make({
-              to: user.email,
-              subject: "Event Registration Confirmed",
-              body: `Your ticket code: ${ticket.code}`,
-            })
-          )
+        return registration
+      }
+    )
 
-          return registration
-        }
-      )
-
-      return Events.of({ register })
-    })
-  )
+    return Events.of({ register })
+  }).pipe(Layer.effect(Events))
 }
 ```
 
