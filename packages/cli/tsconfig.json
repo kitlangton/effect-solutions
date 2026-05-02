@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["bun-types"],
+    "types": ["bun"],
     "outDir": "dist",
     "rootDirs": ["./src", "../../skills/effect-solutions/topics"],
     "noEmit": true

@@ -28,9 +28,10 @@
     "shiki": "^4.0.2"
   },
   "devDependencies": {
-    "@effect/platform-bun": "4.0.0-beta.59",
     "@biomejs/biome": "2.4.7",
+    "@effect/platform-bun": "4.0.0-beta.59",
     "@tailwindcss/postcss": "^4.2.1",
+    "@types/bun": "^1.3.13",
     "@types/hast": "^3.0.4",
     "@types/mdast": "^4.0.4",
     "@types/mdx": "^2.0.13",
