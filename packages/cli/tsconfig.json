@@ -1,10 +1,10 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["bun-types"],
+    "types": ["bun"],
     "outDir": "dist",
-    "rootDirs": ["./src", "../website/docs"],
+    "rootDirs": ["./src", "../../skills/effect-solutions/topics"],
     "noEmit": true
   },
-  "include": ["src/**/*", "../website/docs/**/*.md"]
+  "include": ["src/**/*", "../../skills/effect-solutions/topics/**/*.md"]
 }

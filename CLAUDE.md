@@ -26,7 +26,7 @@ bun install          # Install dependencies
 bun run dev          # Website dev server
 bun run dev:cli      # CLI dev mode
 bun run check        # Biome (writes), tsc --build, tests
-bun --cwd packages/website run format  # Format website/docs
+bun --cwd packages/website run format  # Format website TS/CSS/JSON
 bun --cwd packages/website run generate:og  # Rebuild Open Graph images
 ```
 
@@ -68,7 +68,7 @@ UI components use hard edges; no border radius (use `rounded-none` or omit round
 
 ## Documentation Structure
 
-Documentation lives in `packages/website/docs/`. Each file follows this pattern:
+Documentation lives in `skills/effect-solutions/topics/`. Each file follows this pattern:
 
 ```
 NN-slug.md          # NN = sort order (00-99)
@@ -78,12 +78,13 @@ Files are processed by Next.js and rendered with MDX support. The slug becomes t
 
 ### Adding New Docs
 
-1. Create new file in `packages/website/docs/` with proper numbering
+1. Create new file in `skills/effect-solutions/topics/` with proper numbering
 2. Add frontmatter with title, description, and optionally group
 3. **Create corresponding test file in `tests/`** - All code examples must have tests to ensure they're correct
 4. Run `bun --cwd packages/website run generate:og` to create social images
 5. Test locally with `bun run dev`
 6. Run `bun run test` to verify all examples work
+7. Run `bun run check` before committing — it regenerates `SKILL.md` (and any generator-tracked artifacts) so the agent-skill index stays in sync with topic frontmatter
 
 ### Frontmatter Groups
 
@@ -134,6 +135,7 @@ Built with Effect CLI and Schema for validation (from `effect/Schema`). Tests in
 **Maintenance:** When adding/removing docs, update the topics list in:
 - `<!-- effect-solutions:start -->` block at the bottom of this file
 - `packages/website/src/lib/llm-instructions.ts` (the template for agent files)
+- `skills/effect-solutions/SKILL.md` is regenerated automatically by `bun run check` (and `bun release`) — do not edit by hand
 
 Run `bun run dev:cli -- list` to see current non-draft topics.
 

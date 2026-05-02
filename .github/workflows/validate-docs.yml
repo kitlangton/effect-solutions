@@ -30,7 +30,7 @@ jobs:
 
             VALIDATION TARGETS:
             1. Effect Language Service Setup
-               - Local: packages/website/docs/01-project-setup.md
+               - Local: skills/effect-solutions/topics/01-project-setup.md
                - Source: https://raw.githubusercontent.com/Effect-TS/language-service/main/README.md
 
             INSTRUCTIONS:

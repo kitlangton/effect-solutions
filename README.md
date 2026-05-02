@@ -19,6 +19,12 @@ bunx effect-solutions show http-clients # Show specific topic
 bunx effect-solutions open-issue        # Leave feedback
 ```
 
+**Agent Skill**: Install into your local agent skills directory so Skill-aware agents auto-discover it
+```bash
+npx skills add kitlangton/effect-solutions     # via skills.sh
+gh skill install kitlangton/effect-solutions   # via GitHub CLI
+```
+
 ## Features
 
 - **Practical patterns** - Real-world solutions, not just theory

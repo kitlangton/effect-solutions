@@ -4,12 +4,9 @@ import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import { fileURLToPath } from "node:url"
 
-const BASE_DIR =
-  // bun exposes import.meta.dir; node doesn't
-  // @ts-expect-error bun
-  import.meta.dir ?? fileURLToPath(new URL(".", import.meta.url))
+const BASE_DIR = import.meta.dir ?? fileURLToPath(new URL(".", import.meta.url))
 
-const DOCS_DIR = join(BASE_DIR, "../packages/website/docs")
+const DOCS_DIR = join(BASE_DIR, "../skills/effect-solutions/topics")
 const TEMP_DIR = join(BASE_DIR, "../.docs-typecheck")
 
 type ExtractedBlock = {

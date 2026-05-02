@@ -1,10 +1,11 @@
 import fs from "node:fs"
 import path from "node:path"
+import type { ServerWebSocket } from "bun"
 
 const PORT = Number(process.env.CONTENT_WATCHER_PORT ?? 3201)
-const WATCH_DIR = path.join(process.cwd(), "docs")
+const WATCH_DIR = path.join(process.cwd(), "../../skills/effect-solutions/topics")
 
-const clients = new Set<WebSocket>()
+const clients = new Set<ServerWebSocket<undefined>>()
 
 const _server = Bun.serve({
   port: PORT,

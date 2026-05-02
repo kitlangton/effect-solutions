@@ -2,7 +2,7 @@
 
 ## generate-manifest.ts
 
-Auto-generates `src/docs-manifest.ts` by scanning `packages/website/docs/*.md` files.
+Auto-generates `src/docs-manifest.ts` by scanning `skills/effect-solutions/topics/*.md` files.
 
 **Run manually:**
 ```bash

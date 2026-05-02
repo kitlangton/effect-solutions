@@ -4,21 +4,21 @@ import matter from "gray-matter";
 // Auto-generated manifest - DO NOT EDIT MANUALLY
 // Run: bun run generate:manifest
 
-import DOC__00 from "../../website/docs/00-quick-start.md" with { type: "text" };
-import DOC__01 from "../../website/docs/01-project-setup.md" with { type: "text" };
-import DOC__02 from "../../website/docs/02-tsconfig.md" with { type: "text" };
-import DOC__03 from "../../website/docs/03-basics.md" with { type: "text" };
-import DOC__04 from "../../website/docs/04-services-and-layers.md" with { type: "text" };
-import DOC__05 from "../../website/docs/05-data-modeling.md" with { type: "text" };
-import DOC__06 from "../../website/docs/06-error-handling.md" with { type: "text" };
-import DOC__07 from "../../website/docs/07-config.md" with { type: "text" };
-import DOC__08 from "../../website/docs/08-testing.md" with { type: "text" };
-import DOC__09 from "../../website/docs/09-project-structure.md" with { type: "text" };
-import DOC__10 from "../../website/docs/10-incremental-adoption.md" with { type: "text" };
-import DOC__11 from "../../website/docs/11-http-clients.md" with { type: "text" };
-import DOC__12 from "../../website/docs/12-observability.md" with { type: "text" };
-import DOC__13 from "../../website/docs/13-cli.md" with { type: "text" };
-import DOC__14 from "../../website/docs/14-use-pattern.md" with { type: "text" };
+import DOC__00 from "../../../skills/effect-solutions/topics/00-quick-start.md" with { type: "text" };
+import DOC__01 from "../../../skills/effect-solutions/topics/01-project-setup.md" with { type: "text" };
+import DOC__02 from "../../../skills/effect-solutions/topics/02-tsconfig.md" with { type: "text" };
+import DOC__03 from "../../../skills/effect-solutions/topics/03-basics.md" with { type: "text" };
+import DOC__04 from "../../../skills/effect-solutions/topics/04-services-and-layers.md" with { type: "text" };
+import DOC__05 from "../../../skills/effect-solutions/topics/05-data-modeling.md" with { type: "text" };
+import DOC__06 from "../../../skills/effect-solutions/topics/06-error-handling.md" with { type: "text" };
+import DOC__07 from "../../../skills/effect-solutions/topics/07-config.md" with { type: "text" };
+import DOC__08 from "../../../skills/effect-solutions/topics/08-testing.md" with { type: "text" };
+import DOC__09 from "../../../skills/effect-solutions/topics/09-project-structure.md" with { type: "text" };
+import DOC__10 from "../../../skills/effect-solutions/topics/10-incremental-adoption.md" with { type: "text" };
+import DOC__11 from "../../../skills/effect-solutions/topics/11-http-clients.md" with { type: "text" };
+import DOC__12 from "../../../skills/effect-solutions/topics/12-observability.md" with { type: "text" };
+import DOC__13 from "../../../skills/effect-solutions/topics/13-cli.md" with { type: "text" };
+import DOC__14 from "../../../skills/effect-solutions/topics/14-use-pattern.md" with { type: "text" };
 
 type DocMeta = {
   readonly slug: string;

@@ -67,6 +67,10 @@ const release = Command.make("release").pipe(
       yield* Effect.log("Generating CLI manifest...")
       yield* exec("cd packages/cli && bun ./scripts/generate-manifest.ts")
 
+      // Generate skill
+      yield* Effect.log("Generating SKILL.md...")
+      yield* exec("bun scripts/generate-skill.ts")
+
       // Check for changes and commit with descriptive message
       const changedFiles = yield* getChangedFiles
       if (changedFiles.length > 0) {
