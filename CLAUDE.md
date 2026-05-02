@@ -26,7 +26,7 @@ bun install          # Install dependencies
 bun run dev          # Website dev server
 bun run dev:cli      # CLI dev mode
 bun run check        # Biome (writes), tsc --build, tests
-bun --cwd packages/website run format  # Format website/docs
+bun --cwd packages/website run format  # Format website TS/CSS/JSON
 bun --cwd packages/website run generate:og  # Rebuild Open Graph images
 ```
 
