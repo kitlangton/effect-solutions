@@ -41,6 +41,17 @@ jobs:
       - name: Publish packages via Changesets
         run: npx changeset publish
 
+      - name: Ensure gh CLI has skill subcommand
+        if: startsWith(github.ref, 'refs/tags/effect-solutions@')
+        run: brew upgrade gh || true
+
+      - name: Publish agent skill
+        if: startsWith(github.ref, 'refs/tags/effect-solutions@')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: gh skill publish --tag "$TAG_NAME" || true
+
       - name: Create GitHub release
         if: startsWith(github.ref, 'refs/tags/effect-solutions@')
         env:

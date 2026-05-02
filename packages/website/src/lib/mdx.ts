@@ -3,7 +3,7 @@ import path from "node:path"
 import matter from "gray-matter"
 import { normalizeDocSlug } from "./normalizeDocSlug"
 
-const docsDirectory = path.join(process.cwd(), "docs")
+const docsDirectory = path.join(process.cwd(), "../../skills/effect-solutions/topics")
 
 export type DocGroup = "Setup" | "Core Patterns" | "Ecosystem"
 

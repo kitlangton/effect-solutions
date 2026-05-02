@@ -15,13 +15,14 @@
     "build:cli": "cd packages/cli && bun run build:artifacts",
     "generate:og": "cd packages/website && bun run generate:og",
     "generate:manifest": "bun --cwd packages/cli scripts/generate-manifest.ts",
+    "generate:skill": "bun scripts/generate-skill.ts",
     "changeset": "bun scripts/changeset-named.ts",
     "version": "changeset version && bun install",
     "release": "bun scripts/release.ts",
     "test": "bun run generate:manifest && bunx vitest run",
     "test:docs": "vitest run tests",
     "typecheck:docs": "bun scripts/typecheck-docs.ts",
-    "check": "biome check . --write && bunx tsc --build --force && bun run typecheck:docs && bun run test"
+    "check": "biome check . --write && bunx tsc --build --force && bun run typecheck:docs && bun run generate:skill && bun run test"
   },
   "dependencies": {
     "@next/mdx": "^16.1.7",

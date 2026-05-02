@@ -3,7 +3,7 @@
 import { readdirSync } from "node:fs"
 import { join } from "node:path"
 
-const DOCS_DIR = join(import.meta.dir, "../../website/docs")
+const DOCS_DIR = join(import.meta.dir, "../../../skills/effect-solutions/topics")
 const OUTPUT_FILE = join(import.meta.dir, "../src/docs-manifest.ts")
 
 // Find all .md files in docs directory
@@ -14,7 +14,7 @@ const docFiles = readdirSync(DOCS_DIR)
 // Generate import statements
 const imports = docFiles.map((filename, i) => {
   const varName = `DOC__${i.toString().padStart(2, "0")}`
-  return `import ${varName} from "../../website/docs/${filename}" with { type: "text" };`
+  return `import ${varName} from "../../../skills/effect-solutions/topics/${filename}" with { type: "text" };`
 })
 
 // Generate RAW_DOCS array

@@ -28,7 +28,7 @@ This is a living document that intentionally posts "wrong answers" to get better
 6. Submit a PR
 
 For documentation changes:
-- Edit files in `packages/website/docs/`
+- Edit files in `skills/effect-solutions/topics/`
 - Follow existing patterns and tone
 - Keep examples concise and practical
 - Test locally with `bun run dev`
@@ -37,7 +37,7 @@ For documentation changes:
 
 ### File Structure
 
-Documentation files live in `packages/website/docs/` and follow this naming pattern:
+Documentation files live in `skills/effect-solutions/topics/` and follow this naming pattern:
 
 ```
 NN-slug.md          # NN = sort order (00-99), slug = URL path
@@ -98,7 +98,7 @@ draft: true
 **IMPORTANT:** All code examples in documentation must have corresponding tests to ensure correctness.
 
 1. Create a test file in `tests/` matching your doc filename:
-   - Doc: `packages/website/docs/13-cli.md`
+   - Doc: `skills/effect-solutions/topics/13-cli.md`
    - Test: `tests/13-cli.test.ts`
 
 2. Test all code examples from your documentation:
@@ -136,10 +136,10 @@ OG_ONLY=slug1,slug2 bun --cwd packages/website run generate:og
 
 ### Workflow for Adding Docs
 
-1. **Create the markdown file** in `packages/website/docs/`:
+1. **Create the markdown file** in `skills/effect-solutions/topics/`:
    ```bash
    # Choose next available number in sequence
-   touch packages/website/docs/14-your-topic.md
+   touch skills/effect-solutions/topics/14-your-topic.md
    ```
 
 2. **Add frontmatter** with title, description, order, and group
