@@ -1,5 +1,8 @@
 # Effect Solutions
 
+[![Run in Smithery](https://smithery.ai/badge/skills/kitlangton)](https://smithery.ai/skills?ns=kitlangton&utm_source=github&utm_medium=badge)
+
+
 **Effect best practices and patterns** — https://www.effect.solutions
 
 > **Living Document**: Opinionated collection exploiting Cunningham's Law. Disagree? [Open an issue](https://github.com/kitlangton/effect-solutions/issues/new)
