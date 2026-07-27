@@ -52,8 +52,8 @@ Your editor must use the **workspace** TypeScript version (not its built-in one)
 
 ```json
 {
-  "typescript.tsdk": "./node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "js/ts.tsdk.path": "./node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
 }
 ```
 
