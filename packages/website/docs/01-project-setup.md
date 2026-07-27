@@ -88,10 +88,10 @@ Add to `package.json` to persist across installs:
 
 We recommend cloning the Effect source locally so your AI agent can grep through real implementations, type definitions, and patterns.
 
-The v4 source lives in [`Effect-TS/effect-smol`](https://github.com/Effect-TS/effect-smol). Clone it to a shared location to avoid re-cloning per project:
+The v4 source lives in [`Effect-TS/effect`](https://github.com/Effect-TS/effect). Clone it to a shared location to avoid re-cloning per project:
 
 ```bash
-git clone --depth 1 https://github.com/Effect-TS/effect-smol.git ~/.local/share/effect-solutions/effect
+git clone --depth 1 https://github.com/Effect-TS/effect.git ~/.local/share/effect-solutions/effect
 ```
 
 To update later: `git -C ~/.local/share/effect-solutions/effect pull --depth 1`

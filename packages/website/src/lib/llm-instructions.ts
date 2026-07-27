@@ -117,7 +117,7 @@ Never guess at Effect patterns - check the guide first.
 Clone the Effect v4 source repository to a shared location so AI agents can search real implementations:
 
 \`\`\`bash
-git clone --depth 1 https://github.com/Effect-TS/effect-smol.git ~/.local/share/effect-solutions/effect
+git clone --depth 1 https://github.com/Effect-TS/effect.git ~/.local/share/effect-solutions/effect
 \`\`\`
 
 If the directory already exists, pull the latest changes:
